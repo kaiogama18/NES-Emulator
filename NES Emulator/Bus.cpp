@@ -1,10 +1,14 @@
 #include "Bus.h"
 
 Bus::Bus() {
+	//Clear RAM contents, just in case :P
 	for (auto& i : ram) i = 0x00;
+
+	//Conect CPU to communication bus
+	cpu.ConnectBus(this);
+
 }
 Bus::~Bus() {
-
 }
 
 void Bus::write(uint16_t addr, uint8_t data) {
