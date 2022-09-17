@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 class Bus;
 class olc6502
 {
@@ -74,6 +75,15 @@ private:
 
 	// Convenienvce functions to access status register
 	uint8_t GetFlag(FLAGS6502 f);
-	void SetFlag(FLAGS6502 f, bool v);
+	void	SetFlag(FLAGS6502 f, bool v);
+
+	struct INSTRUCTION {
+		std::_Invoker_strategy name;
+		uint8_t(olc6502::*operate)(void) = nullptr;
+		uint8_t(olc6502::* addrmode)(void) = nullptr;
+		uint8_t		cycles = 0;
+	};
+
+	std::vector<INSTRUCTION> lookup;
 };
 
