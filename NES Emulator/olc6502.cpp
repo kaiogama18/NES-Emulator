@@ -39,22 +39,46 @@ void olc6502::write(uint16_t a, uint8_t d) {
 	bus->write(a, d);
 }
 
-void olc6502::clock() {
-	if (cycles == 0) {
+void olc6502::clock()
+{
+	
+	if (cycles == 0)
+	{
+		
 		opcode = read(pc);
+
+#ifdef LOGMODE
+		uint16_t log_pc = pc;
+#endif
+
+		SetFlag(U, true);
+
 		pc++;
 
-		// Get Starting number of cylces
 		cycles = lookup[opcode].cycles;
 
-		uint8_t additional_cycles1 = (this->*lookup[opcode].addrmode)();
+		uint8_t additional_cycle1 = (this->*lookup[opcode].addrmode)();
 
-		uint8_t additional_cycles2 = (this->*lookup[opcode].operate)();
+		uint8_t additional_cycle2 = (this->*lookup[opcode].operate)();
 
+		
+		cycles += (additional_cycle1 & additional_cycle2);
 
-		cycles += (additional_cycles1 & additional_cycles2);
+		SetFlag(U, true);
 
+#ifdef LOGMODE
+		if (logfile == nullptr)	logfile = fopen("olc6502.txt", "wt");
+		if (logfile != nullptr)
+		{
+			fprintf(logfile, "%10d:%02d PC:%04X %s A:%02X X:%02X Y:%02X %s%s%s%s%s%s%s%s STKP:%02X\n",
+				clock_count, 0, log_pc, "XXX", a, x, y,
+				GetFlag(N) ? "N" : ".", GetFlag(V) ? "V" : ".", GetFlag(U) ? "U" : ".",
+				GetFlag(B) ? "B" : ".", GetFlag(D) ? "D" : ".", GetFlag(I) ? "I" : ".",
+				GetFlag(Z) ? "Z" : ".", GetFlag(C) ? "C" : ".", stkp);
+		}
+#endif
 	}
 
+	clock_count++;
 	cycles--;
 }
