@@ -82,3 +82,22 @@ void olc6502::clock()
 	clock_count++;
 	cycles--;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// FLAG FUNCTIONS
+
+// Returns the value of a specific bit of the status register
+uint8_t olc6502::GetFlag(FLAGS6502 f)
+{
+	return ((status & f) > 0) ? 1 : 0;
+}
+
+// Sets or clears a specific bit of the status register
+void olc6502::SetFlag(FLAGS6502 f, bool v)
+{
+	if (v)
+		status |= f;
+	else
+		status &= ~f;
+}
+
